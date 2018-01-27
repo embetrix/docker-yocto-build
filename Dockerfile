@@ -32,9 +32,6 @@ RUN id build 2>/dev/null || useradd --uid 1000 --create-home build
 RUN apt-get install -y sudo
 RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
-COPY gitconfig  /home/build/.gitconfig
-COPY ssh_config /home/build/.ssh/config
-
 # Fix error "Please use a locale setting which supports utf-8."
 RUN apt-get install -y locales
 RUN locale-gen en_US.UTF-8
@@ -49,6 +46,11 @@ RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 USER build
 RUN echo "build:build" | sudo chpasswd
 RUN echo -e "\n\n\n" | ssh-keygen -t rsa
+
+COPY gitconfig  /home/build/.gitconfig
+COPY ssh_config /home/build/.ssh/config
+RUN sudo chown -R build:build /home/build
+
 WORKDIR /home/build
 CMD ["/bin/bash"]
 
